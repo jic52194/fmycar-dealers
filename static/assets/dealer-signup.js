@@ -1,7 +1,7 @@
 // /signup/ and /verify/ on dealers.fmycar.com (see content/signup.mjs). Copied from fmycar-site on 2026-11-05 when the dealer pages moved here.
 // Keep the server's people-facing validation text (it names the field: email, phone, dealership, website, city and state);
 // a database hint, a code or nothing at all becomes one plain sentence with a way forward.
-function friendlyError(m) { m = String(m || ""); return /\b(email|phone|name|dealership|website|city|state|password|minute|hour|too many|again later|already)\b/i.test(m) ? m : "Something went wrong on our side. Try again in a minute, or call +1 (970) 436-9227 and we will set you up by phone."; }
+function friendlyError(m) { m = String(m || ""); return /\b(email|phone|name|dealership|website|city|state|password|username|taken|minute|hour|too many|again later|already)\b/i.test(m) ? m : "Something went wrong on our side. Try again in a minute, or call +1 (970) 436-9227 and we will set you up by phone."; }
 // Sign-up → rpc fmycar_dealer_signup (creates a regular CarSalesSoftware dealership; the database emails the confirm link).
 // Verify  → rpc fmycar_verify_email with the token from ?t=.
 (function () {
