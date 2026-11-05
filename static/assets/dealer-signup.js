@@ -225,7 +225,7 @@ function friendlyError(m) { m = String(m || ""); return /\b(email|phone|name|dea
     history.replaceState(null, "", location.pathname); // keep the token out of the address bar and analytics
     rpc("fmycar_verify_email", { p_token: t }).then(function (r) {
       step("email_verified", { status: r.status });
-      if (r.status === "verified") end("Email confirmed", (r.dealer ? r.dealer + " is verified. " : "") + "Your in-stock cars can now show on FMYCAR. Sign in to connect your inventory if you haven’t yet.");
+      if (r.status === "verified") end("Email confirmed", (r.dealer ? r.dealer + " is verified. " : "") + "Your email is verified. Sign in to connect your inventory and authorize the displayed monthly listing price. Your cars publish only after your dealership is approved and the listing subscription is active.");
       else if (r.status === "rejected") end("Email confirmed", "We couldn’t verify this dealership. Call or email us and we’ll sort it out.");
       else end("Email confirmed", "Thanks. Our team checks the dealership before your cars go live, usually within one business day. You can sign in and set up your inventory now.");
     }).catch(function (x) { end("We couldn’t confirm that link", x.message); });
