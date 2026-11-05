@@ -1,0 +1,11 @@
+{
+  "name": "fmycar-dealers",
+  "private": true,
+  "type": "module",
+  "description": "dealers.fmycar.com — the dealer side of FMYCAR: what a dealership gets, pricing, how it works, sign-up, dealer directory. Static build, no dependencies.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check-links.mjs",
+    "test": "node scripts/test/brand.test.mjs && node scripts/content-guard.mjs dist && node scripts/seo-check.mjs dist"
+  }
+}

@@ -1,0 +1,41 @@
+name: Build & publish dealers.fmycar.com
+on:
+  push: { branches: [main] }
+  pull_request:
+  workflow_dispatch:
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages, cancel-in-progress: false }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm run build          # no dependencies; the sign-up page reads the live marketplace size from cars.fmycar.com (optional)
+      - run: npm run check          # every internal link resolves
+      - run: npm test               # prices and promises, content guard (plain words, no secrets), search checks
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with: { path: dist }
+      - name: IndexNow ping
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import json, re, urllib.request
+          urls = re.findall(r"<loc>([^<]+)</loc>", open("dist/sitemap.xml").read())
+          key = "be2ff6344271c031cda1a79d1a174ec5"
+          body = json.dumps({"host": "dealers.fmycar.com", "key": key, "keyLocation": f"https://dealers.fmycar.com/{key}.txt", "urlList": urls}).encode()
+          req = urllib.request.Request("https://api.indexnow.org/indexnow", data=body, headers={"content-type": "application/json; charset=utf-8"})
+          try: print("IndexNow", urllib.request.urlopen(req, timeout=30).status, len(urls))
+          except Exception as e: print("IndexNow failed", e)
+          PY
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "${{ steps.d.outputs.page_url }}" }
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4
