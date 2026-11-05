@@ -18,4 +18,7 @@ const RETIRED = /Knowledge Hub membership|strategy session|7-day AI|FMYCAR Insid
 for (const [w, h] of [["home", home], ["pricing", pricing], ["how", how], ["signup", signup], ["directory", dir]]) { never(h, RETIRED, w); never(h, /TODO|FIXME|LOREM IPSUM|INTERNAL NOTE|DEVELOPER NOTE/, w); n += 2; }   // case-sensitive: the sign-up page has a "ds-todo" list class
 // the verify page reads ?t= from the address through the sign-up script (fmycar.com's old /dealers/verify stub carries ?t= along)
 must(verify, "/assets/dealer-signup.js", "verify page script"); must(read("assets/dealer-signup.js"), 'get("t")', "sign-up script"); n += 2;
+const verifyScript = read("assets/dealer-signup.js");
+must(verifyScript, "authorize the displayed monthly listing price", "email verification does not unlock paid listing");
+never(verifyScript, /Your in-stock cars can now show on FMYCAR/, "verification must not promise live cars before billing"); n += 2;
 console.log(`brand: ${n} checks ok`);
