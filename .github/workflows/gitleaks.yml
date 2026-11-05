@@ -1,7 +1,10 @@
 # Secret scan on every push and pull request (launch gate: no key, token or signing secret may ever be committed).
 # gitleaks scans the whole history; a finding fails the job and names the commit, file and rule.
 name: gitleaks
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:   # the very first push of a new repository has no "before" commit, so that run fails; re-run it from here
 permissions:
   contents: read
   pull-requests: read   # the action lists the pull request's commits; without this the PR scan dies with "Resource not accessible by integration"
