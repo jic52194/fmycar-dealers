@@ -1,0 +1,12 @@
+# gitleaks config for the FMYCAR repos (read by .github/workflows/gitleaks.yml). Extends the default rules.
+# Supabase "publishable" keys (prefix sb_publishable_) are public by design: they ship in the browser and only ever reach
+# tables and functions that row-level security opens to anon. They are not secrets, so they are allowed here. The service
+# role key, Stripe keys, GoHighLevel tokens and webhook signing secrets never carry this prefix and stay forbidden.
+title = "FMYCAR"
+[extend]
+useDefault = true
+# IndexNow keys are public by protocol: the key is proved by serving https://<host>/<key>.txt, so the two FMYCAR keys
+# (fmycar.com + cars.fmycar.com share one, dealers.fmycar.com has its own) sit in the deploy workflows on purpose.
+[allowlist]
+description = "Supabase publishable keys and IndexNow keys are public by design"
+regexes = ['''sb_publishable_[A-Za-z0-9_-]{20,}''', '''09cd3b94c41a2e7ee07b19037c9a2dfe''', '''be2ff6344271c031cda1a79d1a174ec5''']
