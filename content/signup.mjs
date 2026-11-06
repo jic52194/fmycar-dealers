@@ -23,6 +23,8 @@ export const PRODUCTS = [
 
 // Live marketplace size, read once per build. Rounded down so the line stays true until the next build.
 let STATS = null;
+/** The live marketplace numbers read at build time (null when the feed could not be read). */
+export const marketStats = () => STATS;
 export async function loadMarketStats() {
   try {
     const r = await fetch(CARS + "/listings.json", { signal: AbortSignal.timeout(20000) });
