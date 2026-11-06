@@ -31,12 +31,10 @@ export const BRAND = {
   },
 };
 export const COMPANY = { legalName: "FMYCAR LLC", addressRegion: "MA", addressCountry: "US" };
+/** The two profiles FMYCAR has (owner, 2026-11-06). Same list on every FMYCAR site. */
 export const SOCIAL = [
-  { name: "LinkedIn", url: "https://www.linkedin.com/company/fmycar/" },
   { name: "Facebook", url: "https://www.facebook.com/fmycar" },
-  { name: "Instagram", url: "https://www.instagram.com/fmycar" },
-  { name: "YouTube", url: "https://www.youtube.com/@fmycar" },
-  { name: "X", url: "https://x.com/fmycar" },
+  { name: "LinkedIn", url: "https://www.linkedin.com/company/fmycar/" },
 ];
 export const FOUNDER = { name: "Jared Casper", title: "Founder", line: "Nearly a decade in dealership sales, finance and leadership on Massachusetts’ North Shore before building CarSalesSoftware for the store and FMYCAR for the buyer." };
 export const ORG_ID = `${HOME}/#org`;
@@ -91,11 +89,63 @@ export function fitDesc(d) {
   const cut = s.lastIndexOf(". ", 156); return cut > 80 ? s.slice(0, cut + 1) : s.slice(0, 157).replace(/\s+\S*$/, "") + "…";
 }
 
-const NAV = [["How it works", "/how-it-works/"], ["Pricing", "/pricing/"], ["Directory", DIRECTORY], ["Dealer sign in", APP + "/"]];
-const header = (path, focus) => `<header class="top${focus ? " focus" : ""}"><div class="wrap row"><a class="logo" href="/" aria-label="FMYCAR for dealers, home">FMY<span>CAR</span></a><span class="focus-tag">For dealers</span>
-${focus ? "" : `<nav class="nav dl-nav" aria-label="Dealer pages">${NAV.map(([n, h]) => `<a href="${h}"${rel(h)}${h === path ? ' aria-current="page"' : ""}>${esc(n)}</a>`).join("")}</nav>`}
-<div class="topcta"><a class="focus-call" href="tel:${PHONE_TEL}" data-track="focus-call"><span>Questions?</span> ${PHONE}</a><a class="btn sm" href="${SIGNUP}" data-track="nav-signup">List your dealership</a></div></div></header>`;
+// ── the shared FMYCAR header and footer (2026-11-06): the same items, order and social links on fmycar.com, cars.fmycar.com,
+// app.fmycar.com and here. Two things differ on this site, on purpose: the primary button is "List your dealership" and the
+// sign-in link is the dealer sign-in. The dealer pages (how it works, pricing, directory) sit in a sub-nav under the header.
+export const LABEL = { cars: "Find My Car", sellCar: "Sell My Car", help: "FMYCAR My Deal", learn: "Learn", guides: "Car buying guides", hub: "Consumer Insider",
+  tools: "Calculators", glossary: "Glossary", first: "First-time buyer guide", seniors: "Seniors & families guide", laughs: "The FML Files",
+  review: "Deal Review", full: "Full Concierge", compare: "Compare both", start: "Start free", pricing: "Pricing" };
+export const NAV_GROUPS = {
+  help: { label: LABEL.help, href: HOME + "/buy", id: "nav-help", items: [
+    [LABEL.review + " · $" + PRICE.review, HOME + "/buy#review", "A human-reviewed report on the dealer’s numbers before you sign"],
+    [LABEL.full + " · $" + PRICE.full, HOME + "/buy#full", "Help through the whole thing: buying, selling, trading or leasing"],
+    [LABEL.compare, HOME + "/buy", "What each includes, what it costs, what it doesn’t promise"],
+    [LABEL.start, HOME + "/start", "Tell us what you’re trying to do. No card"] ] },
+  learn: { label: LABEL.learn, href: HOME + "/guides/", id: "nav-learn", items: [
+    [LABEL.guides, HOME + "/guides/", "Long guides from the dealership side of the desk"],
+    [LABEL.hub, HOME + "/hub/", "Short reads on every car-deal topic, free"],
+    [LABEL.tools, HOME + "/tools/", "Out-the-door, loan, lease, trade equity and more"],
+    [LABEL.glossary, HOME + "/glossary/", "Dealer and finance terms in plain English"] ] },
+};
+export const NAV = [[LABEL.cars, CARS + "/"], "help", [LABEL.sellCar, HOME + "/sell-your-car/"], "learn"];
+/** The dealer pages: a sub-nav under the shared header, and the first group of the phone menu. */
+export const DEALER_NAV = [["How it works", "/how-it-works/"], ["Pricing", "/pricing/"], ["Dealer directory", DIRECTORY], ["List your dealership", SIGNUP], ["Dealer sign in", APP + "/"]];
+const SIGNIN = APP + "/";
+const CHEVRON = `<svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const cur = (h, path) => (h === path ? ' aria-current="page"' : "");
+const mainNav = (path) => `<nav class="mainnav" aria-label="Main"><ul class="nav-list">${NAV.map((x) => {
+  if (typeof x !== "string") { const [n, h] = x; return `<li><a class="nav-a" href="${h}"${rel(h)}>${esc(n)}</a></li>`; }
+  const g = NAV_GROUPS[x];
+  return `<li class="dd" data-dd><a class="nav-a dd-a" href="${g.href}" rel="noopener">${esc(g.label)}</a><button type="button" class="dd-btn" aria-expanded="false" aria-controls="${g.id}" data-dd-btn><span class="sr">${esc(g.label)}: show menu</span>${CHEVRON}</button>
+<div class="dd-panel dd-one" id="${g.id}" data-dd-panel><div class="dd-sec"><ul>${g.items.map(([n, h, d]) => `<li><a href="${h}" rel="noopener"><b>${esc(n)}</b><span>${esc(d)}</span></a></li>`).join("")}</ul></div></div></li>`;
+}).join("")}</ul></nav>`;
+const drawer = (path) => `<div class="drawer" id="menu" data-drawer role="dialog" aria-modal="true" aria-labelledby="menu-title">
+<div class="drawer-head"><p class="logo" id="menu-title">FMY<span>CAR</span><span class="sr"> menu</span></p><a class="drawer-x" href="#" role="button" data-drawer-close aria-label="Close menu"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></a></div>
+<nav class="drawer-nav" aria-label="Menu">
+<p class="drawer-h" id="nav-dealers-m">For dealerships</p><ul class="drawer-list drawer-main" aria-labelledby="nav-dealers-m">${DEALER_NAV.map(([n, h]) => `<li><a href="${h}"${rel(h)}${cur(h, path)}>${esc(n)}</a></li>`).join("")}</ul>
+<p class="drawer-h" id="nav-shop-m">For shoppers</p><ul class="drawer-list" aria-labelledby="nav-shop-m">${NAV.filter((x) => typeof x !== "string").map(([n, h]) => `<li><a href="${h}"${rel(h)}>${esc(n)}</a></li>`).join("")}</ul>
+${Object.values(NAV_GROUPS).map((g) => `<p class="drawer-h" id="${g.id}-m">${esc(g.label)}</p><ul class="drawer-list" aria-labelledby="${g.id}-m">${g.items.map(([n, h]) => `<li><a href="${h}" rel="noopener">${esc(n)}</a></li>`).join("")}</ul>`).join("\n")}
+</nav>
+<div class="drawer-foot"><a class="btn" href="${SIGNUP}" data-track="cta-drawer-signup">List your dealership</a><p class="start-def">${esc(BRAND.line)}</p></div>
+</div>`;
+const subNav = (path) => `<nav class="subnav" aria-label="Dealer pages"><div class="wrap"><span class="subnav-k">For dealerships</span>${DEALER_NAV.filter(([, h]) => h !== SIGNUP).map(([n, h]) => `<a href="${h}"${rel(h)}${cur(h, path)}>${esc(n)}</a>`).join("")}</div></nav>`;
+const header = (path, focus) => focus
+  ? `<header class="top focus"><div class="wrap row"><a class="logo" href="/" aria-label="FMYCAR for dealers, home">FMY<span>CAR</span></a><span class="focus-tag">For dealers</span>
+<div class="topcta"><a class="focus-call" href="tel:${PHONE_TEL}" data-track="focus-call"><span>Questions?</span> ${PHONE}</a><a class="btn sm" href="${SIGNUP}" data-track="nav-signup">List your dealership</a></div></div></header>`
+  : `<header class="top"><div class="wrap row"><a class="logo" href="/" aria-label="FMYCAR for dealers, home">FMY<span>CAR</span></a>
+${mainNav(path)}
+<div class="topcta"><a class="login" href="${SIGNIN}" rel="noopener">Dealer sign in</a><a class="btn sm" href="${SIGNUP}"${cur(SIGNUP, path)} data-track="nav-signup">List your dealership</a></div>
+<a class="burger" href="#menu" role="button" data-burger aria-controls="menu" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Menu</span></a></div>
+${drawer(path)}</header>${subNav(path)}`;
 const footLinks = (h, items) => `<div><p class="foot-h">${esc(h)}</p><ul class="foot-list">${items.map(([n, u]) => `<li><a href="${u}"${rel(u)}>${esc(n)}</a></li>`).join("")}</ul></div>`;
+/** The shared footer columns (same on every FMYCAR site). */
+export const FOOT_COLS = [
+  [LABEL.help, [[LABEL.review, HOME + "/buy#review"], [LABEL.full, HOME + "/buy#full"], [LABEL.compare, HOME + "/buy"], [LABEL.start, HOME + "/start"], [LABEL.pricing, HOME + "/pricing/"], ["Refunds & cancellations", HOME + "/refunds"]]],
+  [LABEL.cars, [["All cars", CARS + "/"], ["By owner", CARS + "/by-owner/"], ["Makes", CARS + "/makes/"], ["Cities", CARS + "/cities/"], ["Recently sold", CARS + "/sold/"], [LABEL.sellCar, HOME + "/sell-your-car/"]]],
+  [LABEL.learn, [[LABEL.guides, HOME + "/guides/"], [LABEL.hub, HOME + "/hub/"], [LABEL.tools, HOME + "/tools/"], [LABEL.glossary, HOME + "/glossary/"], [LABEL.first, HOME + "/first-time-car-buyer"], [LABEL.seniors, HOME + "/car-buying-help-for-seniors"], [LABEL.laughs, HOME + "/laughs/"]]],
+  ["For dealerships", [["For dealerships", "/"], ["List your dealership", SIGNUP], ["Dealer pricing", "/pricing/"], ["How dealer listings work", "/how-it-works/"], ["Dealer directory", DIRECTORY], ["Dealer sign in", APP + "/"]]],
+  ["Company", [["About", HOME + "/about"], ["Press & facts", HOME + "/press"], ["CarSalesSoftware affiliation", HOME + "/about#affiliation"], ["Careers", HOME + "/careers"], ["Contact", "/contact/"], ["Privacy", HOME + "/privacy"], ["Terms", HOME + "/terms"]]],
+];
 
 /** The page shell. Same parameters as fmycar.com's page() so ported content works unchanged; `photo` is ignored (no photo library here). */
 export function page({ path, title, desc, body, schema = [], image, noindex = false, crumbs, ogType = "website", lastmod = TODAY, speak = ["h1", ".lede"], kicker = "FMYCAR for dealers", ogTitle, shareTitle, shareDesc, focus = false }) {
@@ -121,14 +171,12 @@ ${schemas.map(ld).join("")}
 ${header(path, focus)}<main id="main">${crumbs && crumbs.length > 1 ? `<div class="wrap"><nav class="crumbs" aria-label="Breadcrumb">${crumbs.map(([n, p], i) => (i < crumbs.length - 1 ? `<a href="${p || "/"}">${esc(n)}</a>` : `<span>${esc(n)}</span>`)).join(" › ")}</nav></div>` : ""}${body}</main>
 <footer class="foot"><div class="wrap">
 <div class="cols">
-<div><p class="logo">FMY<span>CAR</span></p><p class="tagline">${esc(BRAND.line)}</p><p>${esc(BRAND.boilerplate.short)} Dealerships list for $97, $199 or $299 a month by vehicle count. No commission. No setup fee.</p>
+<div><p class="logo">FMY<span>CAR</span></p><p class="tagline">${esc(BRAND.line)}</p><p>${esc(BRAND.boilerplate.short)}</p>
 <p class="trust">${esc(TRUST)}</p>
 <p><a href="tel:${PHONE_TEL}">${PHONE}</a><br><a href="mailto:${EMAIL}">${EMAIL}</a></p><ul class="social" aria-label="FMYCAR elsewhere">${SOCIAL.map((s) => `<li><a href="${s.url}" rel="me noopener" target="_blank">${esc(s.name)}</a></li>`).join("")}</ul></div>
-${footLinks("For dealers", [["List your dealership", SIGNUP], ["How it works", "/how-it-works/"], ["Pricing", "/pricing/"], ["Dealer directory", DIRECTORY], ["Questions dealers ask", "/how-it-works/#questions"], ["Dealer sign in", APP + "/"]])}
-${footLinks("For shoppers", [["Find My Car", CARS + "/"], ["FMYCAR My Deal", HOME + "/buy"], ["Car buying guides", HOME + "/guides/"], ["Sell My Car", HOME + "/sell-your-car/"]])}
-${footLinks("Company", [["About FMYCAR", HOME + "/about"], ["Press & facts", HOME + "/press"], ["CarSalesSoftware affiliation", HOME + "/about#affiliation"], ["Contact", "/contact/"], ["Privacy", HOME + "/privacy"], ["Terms", HOME + "/terms"], ["Refunds & cancellations", HOME + "/refunds"]])}
+${FOOT_COLS.map(([h, items]) => footLinks(h, items)).join("\n")}
 </div>
-<p class="fine">${esc(ADVICE_LINE)} Prices, availability and details of every listing are set by the dealership or seller. © ${TODAY.slice(0, 4)} ${COMPANY.legalName}.</p>
+<p class="fine">${esc(ADVICE_LINE)} Prices, availability and details of every listing are set by the dealership or seller. © ${TODAY.slice(0, 4)} ${COMPANY.legalName}. <a href="#" onclick="window.dispatchEvent(new Event('cso:consent-open'));return false">Cookie settings</a></p>
 </div></footer>
 <script src="${assetUrl("/assets/app.js")}" defer></script><script src="${assetUrl("/assets/t.js")}" data-site="dealers" data-banner="1" data-ga4="G-HST3TTXRB6" defer></script>
 </body></html>`;
@@ -142,7 +190,7 @@ ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ""}<h1>${h1}</h1><p class
 export const section = (h2, inner, { lead = "", id = "", soft = false, cls = "" } = {}) => `<section class="sec${soft ? " soft" : ""}${cls ? " " + cls : ""}"${id ? ` id="${id}"` : ""}><div class="wrap">${h2 ? `<h2>${h2}</h2>` : ""}${lead ? `<p class="lead-in">${lead}</p>` : ""}${inner}</div></section>`;
 export const cards = (items, cols = 4) => `<div class="cards c${cols}">${items.map(([t, d, href]) => `<div class="card"><h3>${href ? `<a class="stretch" href="${href}"${rel(href)}>${esc(t)}</a>` : esc(t)}</h3><p>${d}</p></div>`).join("")}</div>`;
 export const keepReading = (items, h2 = "Keep reading", opts = {}) => section(h2, cards(items.slice(0, 3), 3), { soft: true, ...opts });
-export const steps = (items) => `<ol class="steps">${items.map(([t, d]) => `<li><h3>${esc(t)}</h3><p>${d}</p></li>`).join("")}</ol>`;
+export const steps = (items) => `<ol class="steps c${Math.min(items.length, 4)}">${items.map(([t, d]) => `<li><h3>${esc(t)}</h3><p>${d}</p></li>`).join("")}</ol>`;
 export const bullets = (items) => `<ul class="checks">${items.map((x) => `<li>${x}</li>`).join("")}</ul>`;
 export const defs = (items) => `<dl class="defs">${items.map(([t, d]) => `<dt>${esc(t)}</dt><dd>${d}</dd>`).join("")}</dl>`;
 /** FAQ: native details/summary, and the same text as FAQPage schema (search engines reject hidden answers). */
@@ -153,6 +201,10 @@ export const faq = (items, h2 = "Questions", id = "") => ({
 /** Recurring-billing disclosure, shown next to every dealer price. The dealer authorizes the charge in the app; this site never charges a card. */
 export function billingNote(amount) {
   return `<p class="bill"><b>$${amount} per month.</b> Billed monthly. Renews each month until you cancel. You authorize the charge in your ${SOFTWARE_NAME} account before it runs, and you can cancel there any time; canceling stops future renewals. No setup fee. No commission. If your inventory grows into a higher price band, we tell you first and the price changes only after you agree.</p>`;
+}
+/** One recurring-billing disclosure for the three prices (the amount sits on each price card). */
+export function billingNoteAll() {
+  return `<p class="bill"><b>${PRICE.dealer.map((t) => "$" + t.price).join(", ")} per month by vehicle count.</b> Billed monthly. Renews each month until you cancel. You authorize the charge in your ${SOFTWARE_NAME} account before it runs, and you can cancel there any time; canceling stops future renewals. No setup fee. No commission. If your inventory grows into a higher price band, we tell you first and the price changes only after you agree.</p>`;
 }
 /** Redirect page (GitHub Pages serves it with a 200, so: canonical + meta refresh + noindex). `keepQuery` carries ?t=… along (the verify link). */
 export const redirect = (from, to, { keepQuery = false } = {}) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved</title><meta name="robots" content="noindex"><link rel="canonical" href="${to.startsWith("http") ? to : SITE + to}"><meta http-equiv="refresh" content="0; url=${to}"><script>location.replace(${JSON.stringify(to)}${keepQuery ? " + location.search" : ""})</script></head><body><p>This page moved to <a href="${to}">${to}</a>.</p></body></html>`;
