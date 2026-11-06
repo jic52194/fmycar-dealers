@@ -405,10 +405,10 @@ main a.gl:hover{color:var(--red,#b50000);text-decoration-style:solid}
 .dir-states{padding-top:14px}
 .dir-states a{font-size:.84rem;padding:5px 12px}
 .dir-state{margin:28px 0 0;scroll-margin-top:180px}
-.dir-state h3{display:flex;align-items:baseline;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);font-size:1.2rem}
-.dir-state h3 a{color:inherit;text-decoration:none}
-.dir-state h3 a:hover{color:var(--red)}
-.dir-state h3 a::after{content:" →";color:var(--red);font-size:.95rem}
+.dir-state>h3{display:flex;align-items:baseline;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);font-size:1.2rem}
+.dir-state>h3 a{color:inherit;text-decoration:none}
+.dir-state>h3 a:hover{color:var(--red)}
+.dir-state>h3 a::after{content:" →";color:var(--red);font-size:.95rem}
 .dir-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .dir-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 18px;display:flex;flex-direction:column;gap:10px;min-width:0;box-shadow:0 1px 0 rgba(17,17,17,.03);transition:border-color .15s ease,box-shadow .15s ease}
 .sec.soft .dir-card{border-color:#eee}
@@ -733,3 +733,38 @@ a,button{-webkit-tap-highlight-color:rgba(181,0,0,.12)}
 /* dealers.fmycar.com: a plain inline nav in the header (the shopper menus of fmycar.com are not used here) */
 .top .dl-nav{display:flex;gap:18px;margin-left:22px;flex-wrap:wrap}.top .dl-nav a{color:var(--ink);text-decoration:none;font-weight:700;padding:10px 0;min-height:44px;display:inline-flex;align-items:center}
 .top .dl-nav a[aria-current]{color:var(--red)}.top .dl-nav a:hover,.top .dl-nav a:focus{color:var(--red)}@media(max-width:900px){.top .dl-nav{display:none}}
+
+/* ── 2026-11-06 design + conversion upgrade: one spacing scale, 44px tap targets, the shared header with a dealer sub-nav,
+   steps four across, price cards, the example lead, the search-first directory ── */
+:root{--s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--sec-y:var(--s8);--sec-y-m:40px}
+@media(max-width:560px){body{font-size:17px}}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px}
+.btn.sm{min-height:44px}
+.fine{font-size:max(.85rem,13px)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.dd-panel.dd-one{grid-template-columns:1fr;width:min(420px,calc(100% - 40px))}
+.top .dl-nav{display:none}
+.subnav{background:var(--soft);border-bottom:1px solid var(--line)}
+.subnav .wrap{display:flex;align-items:center;gap:4px 20px;flex-wrap:wrap;min-height:44px}
+.subnav-k{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);white-space:nowrap}
+.subnav a{color:var(--ink);text-decoration:none;font-weight:700;font-size:.92rem;padding:10px 0;min-height:44px;display:inline-flex;align-items:center;white-space:nowrap}
+.subnav a:hover,.subnav a:focus{color:var(--red)}.subnav a[aria-current]{color:var(--red);box-shadow:inset 0 -2px 0 var(--red)}
+@media(max-width:560px){.subnav .wrap{gap:0 16px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}.subnav-k{display:none}}
+.sec .wrap>ol.steps{max-width:none}
+.steps{grid-template-columns:repeat(4,1fr)}.steps.c3{grid-template-columns:repeat(3,1fr)}.steps.c2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:900px){.steps,.steps.c3{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.steps,.steps.c3,.steps.c2{grid-template-columns:1fr}}
+.plans{align-items:stretch}.plan .kicker{margin-bottom:6px}.plan .checks{font-size:.95rem;margin-bottom:16px}.plan .ctas{margin-top:auto}.plan .ctas .btn{width:100%}
+.lead-ex{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:32px;align-items:center}
+.lead-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:0 10px 30px rgba(17,17,17,.06);max-width:520px}
+.lead-tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 10px}
+.lead-subj{font-weight:800;margin:0 0 4px;font-size:1.05rem}.lead-meta{color:var(--mut);font-size:.9rem;margin:0 0 12px}
+.lead-msg{margin:0 0 12px;padding:12px 14px;background:var(--soft);border-radius:10px}
+.lead-card dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:.92rem}.lead-card dt{color:var(--mut)}.lead-card dd{margin:0;font-weight:700}
+@media(max-width:800px){.lead-ex{grid-template-columns:1fr}.lead-card{max-width:none}}
+.dir-state .dir-card.dir-more[hidden]{display:none !important}
+.dir-showall{display:inline-flex;align-items:center;min-height:44px;margin:12px 0 0;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+.dir-showall:hover{border-color:var(--red);color:var(--red)}.dir-showall[hidden]{display:none}
+.dir-claim{margin-top:auto;font-weight:800;text-decoration:none;color:var(--red);min-height:44px;display:inline-flex;align-items:center}
+.dir-claim:hover{text-decoration:underline}
+.dir-state>h3 small{font-weight:600;color:var(--mut);font-size:.85rem;margin-left:8px}
+@media(max-width:700px){.dir-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 12px;padding:10px 14px;align-items:center}.dir-card>h3,.dir-card>.dir-meta,.dir-card>.dir-links{grid-column:1;min-width:0}.dir-card h3{font-size:1rem}.dir-meta{font-size:.88rem}.dir-card .dir-links{margin-top:0;font-size:.85rem;flex-wrap:nowrap}.dir-site{max-width:62%}.dir-phone{margin-left:8px}.dir-claim{grid-column:2;grid-row:1/span 3;align-self:center;margin:0;white-space:nowrap}}

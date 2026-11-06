@@ -71,15 +71,16 @@ function telHref(phone) {
   return "";
 }
 
-function card(d) {
+const SHOW = 6; // cards shown per state before "Show all"
+function card(d, more = false) {
   const tel = telHref(d.phone);
   const q = [d.dealer_name, d.city, d.state, STATE_NAMES[d.state], hostOf(d.website)].join(" ").toLowerCase();
   const phone = tel ? `<a class="dir-phone" href="${tel}">${esc(d.phone)}</a>` : "";
-  return `<article class="dir-card" data-q="${esc(q)}">
+  return `<article class="dir-card${more ? " dir-more" : ""}" data-q="${esc(q)}"${more ? " hidden" : ""}>
 <h3>${esc(d.dealer_name)}</h3>
 <p class="dir-meta">${esc(d.city)}, ${esc(d.state)}</p>
 <div class="dir-links"><a class="dir-site" href="${esc(d.website)}" rel="noopener" target="_blank">${esc(hostOf(d.website))}</a>${phone}</div>
-<a class="btn" href="${esc(claimUrl(d))}" data-track="dir-claim" aria-label="${esc(`Claim ${d.dealer_name}`)}">Claim this dealership</a>
+<a class="dir-claim" href="${esc(claimUrl(d))}" data-track="dir-claim" aria-label="${esc(`Claim ${d.dealer_name}`)}">Claim →</a>
 </article>`;
 }
 
@@ -94,17 +95,17 @@ function dealerJson(d) {
   };
 }
 
-const DIR_JS = `(()=>{const q=document.getElementById("dirq"),sel=document.getElementById("dirstate"),clear=document.getElementById("dirclear");if(sel)sel.addEventListener("change",()=>{const v=sel.value;if(!v)return;const path=location.pathname.replace(/\\/+$/,"")||"/";if(v.replace(/\\/+$/,"")!==path)location.href=v;});if(!q)return;const cards=[...document.querySelectorAll(".dir-card")],groups=[...document.querySelectorAll(".dir-state")],count=document.getElementById("dircount"),none=document.getElementById("dirnone");const run=()=>{const v=q.value.trim().toLowerCase();let n=0;cards.forEach((el)=>{const hit=!v||(el.getAttribute("data-q")||"").includes(v);el.hidden=!hit;if(hit)n++;});groups.forEach((g)=>{g.hidden=!g.querySelector(".dir-card:not([hidden])");});if(count)count.textContent=v?(n===1?"1 match":n+" matches"):"";if(none)none.hidden=n>0;};q.addEventListener("input",run);if(clear)clear.addEventListener("click",()=>{q.value="";q.focus();run();});try{const s=new URLSearchParams(location.search).get("q");if(s)q.value=s;}catch(e){}if(q.value)run();})();`;
+const DIR_JS = `(()=>{const q=document.getElementById("dirq"),sel=document.getElementById("dirstate"),clear=document.getElementById("dirclear");if(sel)sel.addEventListener("change",()=>{const v=sel.value;if(!v)return;const path=location.pathname.replace(/\\/+$/,"")||"/";if(v.replace(/\\/+$/,"")!==path)location.href=v;});if(!q)return;const cards=[...document.querySelectorAll(".dir-card")],groups=[...document.querySelectorAll(".dir-state")],count=document.getElementById("dircount"),none=document.getElementById("dirnone"),open=new Set();const collapse=()=>{groups.forEach((g)=>{const on=open.has(g.id);g.querySelectorAll(".dir-more").forEach((c)=>{c.hidden=!on;});const b=g.querySelector(".dir-showall");if(b){b.hidden=on;}});};document.querySelectorAll(".dir-showall").forEach((b)=>{b.addEventListener("click",()=>{open.add(b.getAttribute("data-showall"));b.setAttribute("aria-expanded","true");collapse();});});const run=()=>{const v=q.value.trim().toLowerCase();let n=0;if(!v){cards.forEach((el)=>{el.hidden=false;});groups.forEach((g)=>{g.hidden=false;});collapse();if(count)count.textContent="";if(none)none.hidden=true;return;}cards.forEach((el)=>{const hit=(el.getAttribute("data-q")||"").includes(v);el.hidden=!hit;if(hit)n++;});groups.forEach((g)=>{g.hidden=!g.querySelector(".dir-card:not([hidden])");const b=g.querySelector(".dir-showall");if(b)b.hidden=true;});if(count)count.textContent=n===1?"1 match":n+" matches";if(none)none.hidden=n>0;};q.addEventListener("input",run);if(clear)clear.addEventListener("click",()=>{q.value="";q.focus();run();});try{const s=new URLSearchParams(location.search).get("q");if(s)q.value=s;}catch(e){}if(q.value)run();})();`;
 
 function tools(current) {
-  const opts = [`<option value=DIRECTORY${current === DIRECTORY ? " selected" : ""}>All states</option>`]
+  const opts = [`<option value="${DIRECTORY}"${current === DIRECTORY ? " selected" : ""}>All states</option>`]
     .concat(DEALER_STATES.map((code) => `<option value="${statePath(code)}"${current === statePath(code) ? " selected" : ""}>${esc(STATE_NAMES[code])}</option>`));
   return `<div class="dir-panel"><div class="dir-tools"><div class="gl-search dir-search"><label for="dirq">Dealership or city</label><input id="dirq" type="search" placeholder="${current === DIRECTORY ? "Name, city, or state" : "Name or city"}" autocomplete="off" spellcheck="false" enterkeyhint="search"></div>
 <div class="dir-jump"><label for="dirstate">State</label><select id="dirstate">${opts.join("")}</select></div></div>
 <p class="dir-status" id="dircount" aria-live="polite"></p></div>`;
 }
 function stateNav(current) {
-  const all = `<a href=DIRECTORY${current === DIRECTORY ? ' aria-current="page"' : ""}>All states</a>`;
+  const all = `<a href="${DIRECTORY}"${current === DIRECTORY ? ' aria-current="page"' : ""}>All states</a>`;
   const rest = DEALER_STATES.map((code) => {
     const path = statePath(code);
     return `<a href="${path}"${current === path ? ' aria-current="page"' : ""}>${esc(STATE_NAMES[code])}</a>`;
@@ -116,7 +117,7 @@ function pager(code) {
   const prev = DEALER_STATES[i - 1];
   const next = DEALER_STATES[i + 1];
   const link = (c, cls, kicker) => c ? `<a class="${cls}" href="${statePath(c)}"><span>${kicker}</span><b>${esc(STATE_NAMES[c])}</b></a>` : `<span></span>`;
-  return `<nav class="dir-pager" aria-label="Other states">${link(prev, "prev", "Previous")}<a class="dir-pager-all" href=DIRECTORY><span>Directory</span><b>All states</b></a>${link(next, "next", "Next")}</nav>`;
+  return `<nav class="dir-pager" aria-label="Other states">${link(prev, "prev", "Previous")}<a class="dir-pager-all" href="${DIRECTORY}"><span>Directory</span><b>All states</b></a>${link(next, "next", "Next")}</nav>`;
 }
 
 function assertPublic(html, list) {
@@ -153,7 +154,7 @@ function assertPublic(html, list) {
     if (note && lower.includes(note)) throw new Error(`notes rendered for ${d.dealer_name}`);
   }
   for (const d of list) if (!html.includes(esc(claimUrl(d)))) throw new Error(`claim link missing for ${d.dealer_name}`);
-  if (!html.includes(">Claim this dealership<")) throw new Error("dealer directory: claim button missing");
+  if (!html.includes(">Claim →<")) throw new Error("dealer directory: claim link missing");
 }
 
 const trial = `${START}?ref=${REF}`;
@@ -187,7 +188,7 @@ function directoryBlock(list, current) {
   const grouped = current === DIRECTORY;
   const code = grouped ? "" : current.slice(current.lastIndexOf("/") + 1).toUpperCase();
   const body = grouped
-    ? DEALER_STATES.map((st) => `<div class="dir-state" id="${st.toLowerCase()}"><h3><a href="${statePath(st)}">${esc(STATE_NAMES[st])}</a></h3><div class="dir-grid">${byState.get(st).map(card).join("")}</div></div>`).join("")
+    ? DEALER_STATES.map((st) => { const list = byState.get(st), id = st.toLowerCase(); return `<div class="dir-state" id="${id}"><h3><a href="${statePath(st)}">${esc(STATE_NAMES[st])}</a><small>${list.length} dealership${list.length === 1 ? "" : "s"}</small></h3><div class="dir-grid">${list.map((d, i) => card(d, i >= SHOW)).join("")}</div>${list.length > SHOW ? `<button type="button" class="dir-showall" data-showall="${id}" aria-expanded="false" aria-controls="${id}">Show all ${list.length} in ${esc(STATE_NAMES[st])}</button>` : ""}</div>`; }).join("")
     : `<div class="dir-grid">${list.map(card).join("")}</div>${pager(code)}`;
   return `${tools(current)}${stateNav(current)}<div class="dir-all">${body}</div><div class="dir-empty" id="dirnone" hidden><h3>No match</h3><p>Try a shorter name, or a city. You can also sign up and enter your store.</p><p class="ctas"><button type="button" class="btn ghost" id="dirclear">Clear search</button><a class="btn" href="${esc(trial)}" data-track="dir-trial">Sign up your dealership</a></p></div><script>${DIR_JS}</script>`;
 }
@@ -200,7 +201,7 @@ export function dealersIndex() {
   fit("dealers", title, desc);
   const f = faq([
     ["Are these cars for sale?", `No. Each card is a dealership: the name, the city, the website, and the phone number when it is listed. Cars for sale, with prices and photos, are on <a href="${CARS}/" rel="noopener">cars.fmycar.com</a>, and only from stores that choose to publish them.`],
-    ["How do I claim my dealership?", "Choose “Claim this dealership” on your card. The sign-up opens with your dealership name, website, city, and state filled in. This step does not charge a card. After inventory is counted, you authorize $97, $199, or $299 a month."],
+    ["How do I claim my dealership?", "Choose “Claim” on your card. The sign-up opens with your dealership name, website, city, and state filled in. This step does not charge a card. After inventory is counted, you authorize $97, $199, or $299 a month."],
     ["What does it cost to show my cars?", "$97 a month for up to 30 vehicles, $199 for 31–100, and $299 for 101 or more. No commission and no setup fee. A higher plan is charged only after you agree. A card on this page does not publish cars by itself."],
     ["Who receives a shopper’s question?", "When one of your cars is published, the shopper’s question comes to your store by email and in CarSalesSoftware, tied to that car."],
     ["How do published cars stay current?", "They follow the cars you have in CarSalesSoftware and update every few hours. A sold car comes off the listings. Nothing moves from this directory onto the marketplace on its own."],
@@ -210,13 +211,13 @@ export function dealersIndex() {
     eyebrow: "For independent dealers",
     h1: "Claim your dealership.",
     lede: lede("Find your store and claim it."),
-    primary: ["Find your dealership", "#directory"],
-    secondary: ["Sign up your dealership", trial],
+    primary: ["List your dealership", trial],
+    secondary: ["Find your store", "#directory"],
   })
     + section("Find your dealership", directoryBlock(DEALERS, DIRECTORY), {
       id: "directory",
       soft: true,
-      lead: "Search by name or city, or open a state. Claim the card that is yours.",
+      lead: "Type your name or city, or pick a state. Each state shows its first six stores; Show all opens the rest. Claim the card that is yours.",
     })
     + section("What happens when you claim", claimBlock(), {
       id: "claim",
@@ -266,8 +267,8 @@ export function dealerStatePages() {
       eyebrow: name,
       h1: `Claim your dealership in ${name}.`,
       lede: lede(`Find your store in ${name} and claim it.`),
-      primary: ["Find your store", "#directory"],
-      secondary: ["Sign up your dealership", trial],
+      primary: ["List your dealership", trial],
+      secondary: ["Find your store", "#directory"],
     })
       + section(`Dealerships in ${name}`, directoryBlock(list, path), {
         id: "directory",

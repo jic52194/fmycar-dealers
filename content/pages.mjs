@@ -1,8 +1,9 @@
 // Pricing, how it works, contact and the not-found page for dealers.fmycar.com.
-import { page, hero, section, cards, steps, bullets, defs, faq, esc, billingNote, CARS, HOME, APP, SIGNUP, DIRECTORY, PRICE, PLAN_CONSENT, AFFILIATION, SOFTWARE_NAME, PHONE, PHONE_TEL, EMAIL } from "../scripts/lib.mjs";
+import { page, hero, section, cards, steps, bullets, defs, faq, esc, billingNoteAll, CARS, HOME, APP, SIGNUP, DIRECTORY, PRICE, PLAN_CONSENT, AFFILIATION, SOFTWARE_NAME, PHONE, PHONE_TEL, EMAIL } from "../scripts/lib.mjs";
 import { DEALER_FAQ, offersSchema } from "./home.mjs";
 
-const priceRow = (t) => `<tr><th scope="row">${esc(t.name)}</th><td><b>$${t.price}</b><span class="fine">per month</span></td><td>Your in-stock cars on cars.fmycar.com, every shopper question emailed to the store, a public dealership page, automatic inventory updates.</td><td><a href="${SIGNUP}">List your dealership</a></td></tr>`;
+/** One card per price: the vehicle band, the amount, what every plan includes, one button. The first card is the usual start. */
+const planCard = (t, i) => `<div class="plan${i === 0 ? " featured" : ""}"><p class="kicker">${i === 0 ? "Most dealerships start here" : "Dealership listing"}</p><h3>${esc(t.name)}</h3><p class="price"><b>$${t.price}</b><span> per month</span></p>${bullets(["Your in-stock cars on cars.fmycar.com", "Every shopper question emailed to the store", "A public dealership page", "Inventory that updates on its own, every few hours"])}<p class="ctas"><a class="btn${i === 0 ? "" : " ghost"}" href="${SIGNUP}" data-track="pricing-signup-${t.key}">List your dealership</a></p></div>`;
 
 export function pricing() {
   const f = faq([
@@ -16,10 +17,7 @@ export function pricing() {
   const body = hero({ eyebrow: "Dealer pricing · no commissions · no setup fees", h1: "Three prices. One rule: the more cars you list, the higher the plan.", dark: false,
     lede: "A dealership pays a flat monthly listing price by vehicle count, authorized by the dealership before anything publishes. That is the only money between a dealership and FMYCAR.",
     primary: ["List your dealership", SIGNUP], secondary: ["How it works", "/how-it-works/"] })
-    + section("Monthly price by inventory", `<div class="price-table"><table>
-<thead><tr><th scope="col">Vehicles listed</th><th scope="col">Price</th><th scope="col">What it includes</th><th scope="col"></th></tr></thead>
-<tbody>${PRICE.dealer.map(priceRow).join("")}</tbody></table></div>
-${PRICE.dealer.map((t) => billingNote(t.price)).join("")}`, { id: "plans" })
+    + section("Monthly price by inventory", `<div class="plans">${PRICE.dealer.map(planCard).join("")}</div>${billingNoteAll()}`, { id: "plans", lead: "The plan is the number of vehicles you have listed, not a feature bundle. Every plan includes the same things." })
     + section("If your inventory grows", `<p>${esc(PLAN_CONSENT)}</p><p>If it shrinks, tell us and we move you down from the next invoice. FMYCAR never changes a price on its own, in either direction.</p>`, { soft: true, id: "growth" })
     + section("What the price does not include", bullets([
       `${SOFTWARE_NAME}, the dealer management software, is a separate product with its own price. You can list on FMYCAR without it.`,

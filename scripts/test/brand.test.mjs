@@ -12,7 +12,11 @@ let n = 0;
 for (const [w, h] of [["home", home], ["pricing", pricing]]) for (const s of ["$97", "$199", "$299", "No commission", "No setup fee", "never changes an existing subscription on its own"]) { must(h, s, w); n++; }
 must(home, 'href="/signup/"', "home"); must(how, 'href="/signup/"', "how it works"); must(home, "not a dealer", "home"); n += 3;
 must(signup, "does not charge a card", "signup"); must(signup, 'data-ds="signup"', "signup form"); must(verify, 'data-ds="verify"', "verify page"); n += 3;
-must(dir, ">Claim this dealership<", "directory"); must(dir, "/signup/?name=", "directory claim link"); n += 2;
+must(dir, ">Claim →<", "directory"); must(dir, "/signup/?name=", "directory claim link"); must(dir, 'class="dir-showall"', "directory show-all"); n += 3;
+// 2026-11-06 design upgrade: the example lead, price cards, the shared header (phone menu, Consumer Insider), two social profiles only
+must(home, "Example lead", "home"); must(home, 'class="lead-card"', "home example lead"); must(pricing, 'class="plan featured"', "pricing cards"); n += 3;
+for (const h of [home, pricing, how, dir]) { must(h, 'data-burger', "phone menu"); must(h, ">Consumer Insider<", "header learn group"); never(h, /instagram\.com|youtube\.com|x\.com\/fmycar|twitter\.com/, "social links"); never(h, /Knowledge Hub(?! membership)/, "old hub label"); n += 4; }
+assert.equal((home.match(/class="steps c4"/g) || []).length, 1, "home: four steps in a four-column grid"); n++;
 for (const h of [home, pricing, how, signup]) { must(h, "FMYCAR LLC", "footer"); must(h, 'href="https://www.linkedin.com/company/fmycar/"', "footer social"); n += 2; }
 const RETIRED = /Knowledge Hub membership|strategy session|7-day AI|FMYCAR Insider|salesperson plan|Dealership Growth Platform|Turn Every Service Visit|Book My Demo|CarSales AI|\btiers?\b/i;
 for (const [w, h] of [["home", home], ["pricing", pricing], ["how", how], ["signup", signup], ["directory", dir]]) { never(h, RETIRED, w); never(h, /TODO|FIXME|LOREM IPSUM|INTERNAL NOTE|DEVELOPER NOTE/, w); n += 2; }   // case-sensitive: the sign-up page has a "ds-todo" list class

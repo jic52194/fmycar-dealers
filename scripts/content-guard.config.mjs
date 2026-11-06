@@ -12,6 +12,7 @@ export default {
     { id: "coming-soon", re: /coming (soon|online)/i, html: true, js: true },
     { id: "raw-status", re: /\b(past_due|intake_received|waiting_on_you|needs_docs|in_review)\b/, html: true, js: false },
     { id: "tier", re: /\b(dealer|dealership|listing|monthly|pricing|subscription|FMYCAR) tiers?\b|\btiers?: \$|\btier (97|199|299)\b/i, html: true, js: true },
+    { id: "crude", re: /\bF[’']n\b/, html: true, js: true },   // owner rule 2026-11-06: no crude wording on the dealer pages (fmycar.com keeps it under /laughs/ only)
     { id: "old-pitch", re: /Dealership Growth Platform|Turn Every Service Visit|service.survey|Book My Demo|Schedule Live Demo/i, html: true, js: true },   // the retired GoHighLevel site
   ],
   allow: [],
