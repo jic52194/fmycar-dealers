@@ -86,7 +86,7 @@ ${f("username", "Username", { req: true, auto: "username", max: 40, full: true, 
 </fieldset>
 <p class="fm-err" role="alert" data-err1 hidden></p>
 <p class="ds-fine ds-legal">You agree to the <a href="https://carsalessoftware.com/terms" rel="noopener">Terms</a> and <a href="https://carsalessoftware.com/privacy" rel="noopener">Privacy Policy</a>.</p>
-<p class="ds-fine ds-legal">Have an account? <a href="${APP}/" rel="noopener">Sign in</a></p>
+<p class="ds-fine ds-legal">Have an account? <a href="${APP}/" rel="noopener">Sign in</a> · <a href="${APP}/reset" rel="noopener">Forgot your password?</a></p>
 </form>
 <div class="ds-done" tabindex="-1" hidden>
 <p class="ds-done-h">You’re in.</p>
