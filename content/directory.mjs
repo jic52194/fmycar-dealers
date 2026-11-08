@@ -1,6 +1,7 @@
 // Independent dealer directory (/directory/ and /directory/<state>/). Moved here from fmycar.com on 2026-11-05.
 // State pages stay noindex: they exist for the claim flow, not as search landing pages (28 states have under 10 dealers).
-// Public cards show name, city, state, website, phone, and a claim link.
+// Public cards show name, city, state, website and a claim link. No dealer phone (owner, 2026-11-08): 978-822-7737 is the
+// only number FMYCAR publishes, so dealer phones stay in data/dealers.json with the other private fields.
 // Emails, notes, ratings, maps, social, and inventory fields stay in data/dealers.json and are not rendered.
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -73,25 +74,21 @@ function telHref(phone) {
 
 const SHOW = 6; // cards shown per state before "Show all"
 function card(d, more = false) {
-  const tel = telHref(d.phone);
   const q = [d.dealer_name, d.city, d.state, STATE_NAMES[d.state], hostOf(d.website)].join(" ").toLowerCase();
-  const phone = tel ? `<a class="dir-phone" href="${tel}">${esc(d.phone)}</a>` : "";
   return `<article class="dir-card${more ? " dir-more" : ""}" data-q="${esc(q)}"${more ? " hidden" : ""}>
 <h3>${esc(d.dealer_name)}</h3>
 <p class="dir-meta">${esc(d.city)}, ${esc(d.state)}</p>
-<div class="dir-links"><a class="dir-site" href="${esc(d.website)}" rel="noopener" target="_blank">${esc(hostOf(d.website))}</a>${phone}</div>
+<div class="dir-links"><a class="dir-site" href="${esc(d.website)}" rel="noopener" target="_blank">${esc(hostOf(d.website))}</a></div>
 <a class="dir-claim" href="${esc(claimUrl(d))}" data-track="dir-claim" aria-label="${esc(`Claim ${d.dealer_name}`)}">Claim →</a>
 </article>`;
 }
 
 function dealerJson(d) {
-  const tel = telHref(d.phone);
   return {
     "@type": "AutoDealer",
     name: d.dealer_name,
     url: d.website,
     address: { "@type": "PostalAddress", addressLocality: d.city, addressRegion: d.state, addressCountry: "US" },
-    ...(tel ? { telephone: tel.replace("tel:", "") } : {}),
   };
 }
 
@@ -200,7 +197,7 @@ export function dealersIndex() {
   const desc = "Find your dealership and claim it. FMYCAR listings are $97 to $299 a month by vehicle count. Your name, city, and state come filled in.";
   fit("dealers", title, desc);
   const f = faq([
-    ["Are these cars for sale?", `No. Each card is a dealership: the name, the city, the website, and the phone number when it is listed. Cars for sale, with prices and photos, are on <a href="${CARS}/" rel="noopener">cars.fmycar.com</a>, and only from stores that choose to publish them.`],
+    ["Are these cars for sale?", `No. Each card is a dealership: the name, the city, and the website. Cars for sale, with prices and photos, are on <a href="${CARS}/" rel="noopener">cars.fmycar.com</a>, and only from stores that choose to publish them.`],
     ["How do I claim my dealership?", "Choose “Claim” on your card. The sign-up opens with your dealership name, website, city, and state filled in. This step does not charge a card. After inventory is counted, you authorize $97, $199, or $299 a month."],
     ["What does it cost to show my cars?", "$97 a month for up to 30 vehicles, $199 for 31–100, and $299 for 101 or more. No commission and no setup fee. A higher plan is charged only after you agree. A card on this page does not publish cars by itself."],
     ["Who receives a shopper’s question?", "When one of your cars is published, the shopper’s question comes to your store by email and in CarSalesSoftware, tied to that car."],

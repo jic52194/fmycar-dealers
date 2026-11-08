@@ -154,7 +154,7 @@ ${live}${onNow}</div>
 <div class="ds-mail-top"><span class="ds-ex">Example</span><span class="ds-mail-from">FMYCAR → you</span></div>
 <p class="ds-mail-subj">New FMYCAR lead: Jordan asked about the 2021 Toyota RAV4 XLE</p>
 <div class="ds-mail-body"><p><b>Jordan</b> asked about the 2021 Toyota RAV4 XLE · $24,990 on cars.fmycar.com.</p>
-<dl><dt>Phone</dt><dd>(555) 010-0199</dd><dt>Email</dt><dd>jordan@example.com</dd><dt>Message</dt><dd>Is it still available? Can I see it Saturday?</dd></dl>
+<dl><dt>Email</dt><dd>jordan@example.com</dd><dt>Message</dt><dd>Is it still available? Can I see it Saturday?</dd></dl>
 <p>Reply fast — the shopper is expecting <b>your dealership</b> to reach out.</p>
 <p class="ds-mail-btns"><span class="ds-mail-btn">Open the lead</span><span class="ds-mail-link">See the listing</span></p></div>
 </div><ul class="ds-mail-notes">${["Sent to managers and salespeople", "Also in Leads in the app, car attached", "Shopper agreed to be contacted"].map(check).join("")}</ul>`, { soft: true, id: "lead" });
