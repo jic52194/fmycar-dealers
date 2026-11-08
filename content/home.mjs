@@ -4,7 +4,7 @@ import { DEALERS } from "./directory.mjs";
 import { marketStats } from "./signup.mjs";
 
 /** An example of the email a store gets (made-up shopper and car, labelled as such). The real one has the same fields. */
-const leadExample = () => `<div class="lead-card" aria-label="Example lead"><p class="lead-tag">Example lead · made-up details</p><p class="lead-subj">New lead: 2019 Honda CR-V EX · $18,990</p><p class="lead-meta">Arrived 11:42 am · by email and in your app, with the car attached</p><p class="lead-msg">“Hi, is this still available? I’d like to see it Saturday morning. Does it come with a second key?”</p><dl><dt>Name</dt><dd>Alex R.</dd><dt>Phone</dt><dd>(555) 010-2264</dd><dt>Email</dt><dd>alex@example.com</dd><dt>Consent</dt><dd>Agreed to be contacted by you and by FMYCAR</dd></dl></div>`;
+const leadExample = () => `<div class="lead-card" aria-label="Example lead"><p class="lead-tag">Example lead · made-up details</p><p class="lead-subj">New lead: 2019 Honda CR-V EX · $18,990</p><p class="lead-meta">Arrived 11:42 am · by email and in your app, with the car attached</p><p class="lead-msg">“Hi, is this still available? I’d like to see it Saturday morning. Does it come with a second key?”</p><dl><dt>Name</dt><dd>Alex R.</dd><dt>Email</dt><dd>alex@example.com</dd><dt>Consent</dt><dd>Agreed to be contacted by you and by FMYCAR</dd></dl></div>`;
 
 export function offersSchema() {
   return {
